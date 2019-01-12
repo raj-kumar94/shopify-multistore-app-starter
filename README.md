@@ -7,9 +7,9 @@ cp .env.example .env
 
 node app.js
 
-go hit browser with http://localhost:8000
 ```
 
+go hit browser with `http://localhost:8000`
 
 # verifying webhooks
 
@@ -83,3 +83,34 @@ router.post('/logout', isBasic, usersController.logout);
 - if isBasic is applied, all users can access that route
 - if isVendor is applied, vendor and admin can access the route
 - if isAdmin is applied, only admin can access the route
+
+
+
+# Directory Structure
+
+I tried to follow MVC structure, where 
+
+- models can be found in models directory
+- controllers can be found in controllers directory
+- views can be found in views directory
+
+Controllers contains the logic implementations, all routes can be found in routes directory
+
+
+## decoding a route
+
+`/store/store-settings`
+
+app.js is entry file, you can see a statement there
+
+```
+app.use('/store', config);
+```
+
+in routes/config.js you can see the entry
+
+```
+router.get('/store-settings', isVendor, getSettingPage);
+```
+
+where getSettingPage is a function available in configsController
