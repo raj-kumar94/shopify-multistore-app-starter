@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{>head }}
+
+</head>
+
+<body>
+    {{>navbar }}
+
+
+    <div class="container">
+        <div class="row">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-4">
+                    <form class="form-inline" action="/store/webhook-settings/create" method="POST">
+                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                        <div class="form-group">
+                            <input type="topic" class="form-control" name="topic" placeholder="orders/create">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Webhook</button>
+                    </form>
+                </div> <br><br><br><br>
+            </div>
+            <div class="col-md-6 col-md-offset-2">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Topic</th>
+                        <th>Address</th>
+                        <th>Created At</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each webhooks}}
+                        <tr>
+                            <td>{{id}}</td>
+                            <td>{{topic}}</td>
+                            <td>{{address}}</td>
+                            <td>{{created_at}}</td>
+                            <td>
+                                <form action="/store/webhook-settings/delete/{{id}}" method="post">
+                                    <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <br><br>
+    {{>footer}}
+    <br>
+
+</body>
+
+</html>
