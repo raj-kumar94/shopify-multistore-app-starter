@@ -13,7 +13,7 @@ let setupSession = (app) => {
         app.use(session({
             store: new RedisStore({host:host, port:port}),
             key: 'user_sid',
-            secret: 'OneTwoKaFour?',
+            secret: process.env.SESSION_SECRET || 'OneTwoKaFour?',
             resave: false,
             saveUninitialized: false,
             cookie: {
@@ -24,7 +24,7 @@ let setupSession = (app) => {
         const MongoStore = require('connect-mongo')(session);
         app.use(session({
             key: 'user_sid',
-            secret: 'OneTwoKaFour?',
+            secret: process.env.SESSION_SECRET || 'OneTwoKaFour?',
             resave: false,
             saveUninitialized: false,
             store: new MongoStore({
@@ -40,7 +40,7 @@ let setupSession = (app) => {
     }else{
         app.use(session({
             key: 'user_sid',
-            secret: 'OneTwoKaFour?',
+            secret: process.env.SESSION_SECRET || 'OneTwoKaFour?',
             resave: false,
             saveUninitialized: false,
             cookie: {
@@ -60,8 +60,13 @@ let setupSession = (app) => {
 
     // adding property _isAdmin so that it can be used in hbs
     app.use((req, res, next) => {
-        if (req.cookies.user_sid && req.session.user && req.session.user_type=='admin') {
-            res.locals._isAdmin = true; 
+        if (req.cookies.user_sid && req.session.user && req.session.user_type) {
+            res.locals._userType = req.session.user_type; 
+            if(req.session.user_type === "admin") {
+                res.locals._isAdmin = true; 
+            } else {
+                res.locals._isAdmin = false; 
+            }
             res.locals.currentUser = req.session.user;    
             next();
         }else{
@@ -76,14 +81,14 @@ function userType(res, user){
     switch(user)
     {
         case 0:
-        res.locals._userType="admin";
-        break;
+            res.locals._userType="admin";
+            break;
         case 1:
-        res.locals._userType="vendor";
-        break;
+            res.locals._userType="vendor";
+            break;
         case 2:
-        res.locals._userType="basic";
-        break;    
+            res.locals._userType="basic";
+            break;    
     }
 }
 

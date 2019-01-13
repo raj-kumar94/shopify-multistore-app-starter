@@ -98,19 +98,14 @@ app.use('/webhooks', registerWebhooks);
 app.use('/user', user);
 app.use('/order', order);
 app.use('/store', config);
-
+app.use('/', user);
 
 
 // public app end points
 
-// const salesApp = require('./shopify/publicApp');
-// app.get('/shopify', salesApp.shopify);
-// app.get('/shopify/callback', salesApp.callback);
-
-
-app.get('/', isAdmin , (req, res) => {
-  res.render('base.hbs');
-}); 
+// const { shopifyInit, ShopifyCallback } = require('./shopify/publicApp');
+// app.get('/shopify', shopifyInit);
+// app.get('/shopify/callback', ShopifyCallback);
 
 
 app.listen(port, () => {

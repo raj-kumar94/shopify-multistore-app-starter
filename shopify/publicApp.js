@@ -1,34 +1,33 @@
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
 const querystring = require('querystring');
 const cookie = require('cookie');
 const nonce = require('nonce')();
 var crypto = require('crypto');
 var request = require('request-promise');
 
+const scopes = 'read_product_listings,write_checkouts,read_products,read_checkouts,read_orders,read_draft_orders';
+const forwardingAddress = process.env.DEPOLOYMENT === "test" ? process.env.TEST_BASE_URL : process.env.PRODUCTION_BASE_URL;
+const apiKey = process.env.SHOPIFY_API_KEY;
+const apiSecret = process.env.SHOPIFY_API_SECRET;
 
-var {apiKey, apiSecret, scopes, forwardingAddress} = require("../shopify/credentials");
+let shopifyInit = (req, res) => {
+  const shop = req.query.shop;
+  if (shop) {
+    const state = nonce();
+    const redirectUri = forwardingAddress + '/shopify/callback';
+    const installUrl = 'https://' + shop +
+      '/admin/oauth/authorize?client_id=' + apiKey +
+      '&scope=' + scopes +
+      '&state=' + state +
+      '&redirect_uri=' + redirectUri;
 
-exports.shopify = (req, res) => {
-  console.log('first');
-    const shop = req.query.shop;
-    if (shop) {
-      const state = nonce();
-      const redirectUri = forwardingAddress + '/shopify/callback';
-      const installUrl = 'https://' + shop +
-        '/admin/oauth/authorize?client_id=' + apiKey +
-        '&scope=' + scopes +
-        '&state=' + state +
-        '&redirect_uri=' + redirectUri;
-  
-      res.cookie('state', state);
-      res.redirect(installUrl);
-    } else {
-      return res.status(400).send('Missing shop parameter. Please add ?shop=your-development-shop.myshopify.com to your request');
-    }
-  };
+    res.cookie('state', state);
+    res.redirect(installUrl);
+  } else {
+    return res.status(400).send('Missing shop parameter. Please add ?shop=your-development-shop.myshopify.com to your request');
+  }
+};
 
-exports.callback = (req, res) => {
+let ShopifyCallback = async (req, res) => {
   console.log('Second');
   const { shop, hmac, code, state } = req.query;
   const stateCookie = cookie.parse(req.headers.cookie).state;
@@ -61,32 +60,30 @@ exports.callback = (req, res) => {
         code,
       };
       
-      request.post(accessTokenRequestUrl, { json: accessTokenPayload })
-      .then((accessTokenResponse) => {
+      try {
+        let accessTokenResponse = await request.post(accessTokenRequestUrl, { json: accessTokenPayload });
         const accessToken = accessTokenResponse.access_token;
         console.log("accessToken: "+ accessToken);
-      
 
         // now make an request with accessToken
         const shopRequestUrl = 'https://' + shop + '/admin/shop.json';
         const shopRequestHeaders = {
           'X-Shopify-Access-Token': accessToken,
         };
-        
-        request.get(shopRequestUrl, { headers: shopRequestHeaders })
-        .then((shopResponse) => {
-          // res.end(shopResponse);
-          res.send(shopResponse);
-        })
-        .catch((error) => {
-          res.status(error.statusCode).send(error.error.error_description);
-        });
-      })
-      .catch((error) => {
-        res.status(error.statusCode).send(error.error.error_description);
-      });
 
+        let shopResponse = await request.get(shopRequestUrl, { headers: shopRequestHeaders });
+        res.send(shopResponse);
+      } catch (error) {
+        res.status(500).send(error);
+      }
   } else {
     res.status(400).send('Required parameters missing');
   }
-}; 
+
+}
+
+
+module.exports = {
+  shopifyInit,
+  ShopifyCallback
+}

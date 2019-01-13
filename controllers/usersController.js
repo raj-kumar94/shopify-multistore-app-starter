@@ -76,7 +76,7 @@ exports.postLogin = (req, res) => {
 // route for user's dashboard
 exports.home = (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
-        res.render('index.hbs');
+        res.render('base.hbs');
     } else {
         res.redirect('/user/login');
     }
