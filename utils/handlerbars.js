@@ -28,6 +28,9 @@ let registerHelpers = (hbs) => {
         let operator = options.hash.operator || "==";
 
         let operators = {
+            'eq': function (l, r) {
+                return l == r;
+            },
             '==': function (l, r) {
                 return l == r;
             },

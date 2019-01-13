@@ -14,6 +14,10 @@ go hit browser with `http://localhost:8000`
 # verifying webhooks
 
 ```
+  const verifyShopifyWebhook = require('../utils/verifyWebhooks');
+  .
+  .
+  .
   let store_url = req.headers['x-shopify-shop-domain'];
   let status;
 
@@ -114,3 +118,8 @@ router.get('/store-settings', isVendor, getSettingPage);
 ```
 
 where getSettingPage is a function available in configsController
+
+
+## TODOs
+
+- add logger

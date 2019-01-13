@@ -1,6 +1,6 @@
 "use strict";
 
-const verifyShopifyWebhook = require('../middlewares/verifyWebhooks');
+const verifyShopifyWebhook = require('../utils/verifyWebhooks');
 
 
 /**
@@ -21,7 +21,7 @@ let productUpdate = async (req, res) => {
     console.log('cannot verify request');
     return;
   }
-  console.log('yo');
+  // do your stuffs here
 }
 
 

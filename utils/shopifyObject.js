@@ -75,59 +75,6 @@ let getShopifyObject = (store_url) => {
 
 
 /**
- * Updates Shopify app settings
- * @param {Request} req 
- * @param {Response} res 
- */
-let setShopifyAppSetting = async (req, res) => {
-    let data = req.body;
-    let store_url = data.store_url;
-    if(!store_url) {
-        return res.status(400).send({"msg": "store_url is required"});
-    }
-    data.created_at = Date.now();
-    try {
-        await StoreDetail.update(
-            {store_url: store_url},
-            req.body,
-            {upsert: true, setDefaultsOnInsert: true}
-        );
-        return res.send({"msg": "updated"});
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send(error);
-    }
-
-}
-
-
-/**
- * Retreive Shopify app settings
- * @param {Request} req 
- * @param {Response} res 
- */
-let getShopifyAppSetting = ({store}) => {
-    // let store = "marmetogold.myshopify.com";
-    return new Promise( async (resolve, reject) => {
-        let storeDetail = undefined;
-        try {
-            storeDetail = await StoreDetail.findOne({store_url: store});
-            if(!storeDetail) {
-                reject({"msg": "No record found"})
-                // return res.status(400).send({"msg": "No record found"});
-            }
-        } catch (error) {
-            console.log(error);
-            reject(error);
-            // return res.status(500).send(error);
-        }
-        resolve(storeDetail);
-    });
-    // return res.send(storeDetail);
-}
-
-
-/**
  * 
  * Testing with Apache benchmark: 100 requests, 10 concurrency
  * ab -c 10 -n 100 http://localhost:8000/settings/shopify/store-data/test/
@@ -157,7 +104,5 @@ let testShopifyObject = (req, res) => {
 
 module.exports = {
     getShopifyObject,
-    setShopifyAppSetting,
-    getShopifyAppSetting,
     testShopifyObject
 }

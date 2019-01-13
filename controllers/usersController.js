@@ -1,10 +1,10 @@
 "use strict";
 
 const { User } = require('../models/user');
-const { StoreDetail } = require('../models/storeDetail');
+// const { StoreDetail } = require('../models/storeDetail');
 
 // route for user signup
-exports.getSignup = (req, res) => {
+let getSignup = (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
         res.redirect('/');
     } else {
@@ -16,7 +16,7 @@ exports.getSignup = (req, res) => {
  * Admin signup route
  */ 
 
-exports.postSignup = (req, res) => {
+let postSignup = (req, res) => {
     let user_type = 'admin';
 
     User.create({
@@ -41,7 +41,7 @@ exports.postSignup = (req, res) => {
 
 // route for user Login
 
-exports.getLogin = (req, res) => {
+let getLogin = (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
         res.redirect('/');
     } else {
@@ -50,7 +50,7 @@ exports.getLogin = (req, res) => {
 }
 
 
-exports.postLogin = (req, res) => {
+let postLogin = (req, res) => {
     // console.log('post login');
     var email = req.body.email,
     password = req.body.password;
@@ -74,7 +74,7 @@ exports.postLogin = (req, res) => {
 
 
 // route for user's dashboard
-exports.home = (req, res) => {
+let home = (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
         res.render('base.hbs');
     } else {
@@ -84,11 +84,21 @@ exports.home = (req, res) => {
 
 
 // route for user logout
-exports.logout = (req, res) => {
+let logout = (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
         res.clearCookie('user_sid');
         res.redirect('/');
     } else {
         res.redirect('/login');
     }
+}
+
+
+module.exports = {
+    getLogin,
+    postLogin,
+    getSignup,
+    postSignup,
+    home,
+    logout
 }
